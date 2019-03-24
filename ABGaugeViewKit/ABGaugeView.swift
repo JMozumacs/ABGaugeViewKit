@@ -36,6 +36,14 @@ public class ABGaugeView: UIView {
         }
     }
     
+    @IBInspectable public var useSimpleNeedle: Bool = false
+    
+    @IBInspectable public var circlePercents: CGFloat = 0.1{
+        didSet{
+            setNeedsDisplay()
+        }
+    }
+    
     @IBInspectable public var blinkAnimate: Bool = true
     
     @IBInspectable public var circleColor: UIColor = UIColor.black
@@ -107,7 +115,7 @@ public class ABGaugeView: UIView {
         animation.fromValue = 1
         animation.toValue = 0.2
         animation.duration = 0.1
-        animation.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionDefault)
+        animation.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.default)
         animation.autoreverses = true
         animation.repeatCount = 3
         self.layer.add(animation, forKey: "opacity")
@@ -148,7 +156,8 @@ public class ABGaugeView: UIView {
         // 1
         let center = center
         let radius: CGFloat = max(bounds.width, bounds.height)/2 - self.frame.width/20
-        let lineWidth: CGFloat = self.frame.width/10
+        let lineWidth: CGFloat = 2//self.frame.width/30
+        
         // 2
         let path = UIBezierPath(arcCenter: center,
                                 radius: radius,
@@ -165,7 +174,8 @@ public class ABGaugeView: UIView {
     func drawNeedleCircle() {
         // 1
         let circleLayer = CAShapeLayer()
-        let circlePath = UIBezierPath(arcCenter: CGPoint(x: bounds.width / 2, y: bounds.height / 2), radius: self.bounds.width/20, startAngle: 0.0, endAngle: CGFloat(2 * Double.pi), clockwise: false)
+        let circlePath = UIBezierPath(arcCenter: CGPoint(x: bounds.width / 2, y: bounds.height / 1.85), radius: bounds.width * circlePercents
+            , startAngle: 0.0, endAngle: CGFloat(Double.pi), clockwise: false)
         // 2
         circleLayer.path = circlePath.cgPath
         circleLayer.fillColor = circleColor.cgColor
@@ -183,9 +193,12 @@ public class ABGaugeView: UIView {
         
         // 3
         let needlePath = UIBezierPath()
-        needlePath.move(to: CGPoint(x: self.bounds.width/2, y: self.bounds.width * 0.95))
-        needlePath.addLine(to: CGPoint(x: self.bounds.width * 0.47, y: self.bounds.width * 0.42))
-        needlePath.addLine(to: CGPoint(x: self.bounds.width * 0.53, y: self.bounds.width * 0.42))
+        needlePath.move(to: CGPoint(x: self.bounds.width/2, y: self.bounds.width))
+        
+        if useSimpleNeedle == false{
+            needlePath.addLine(to: CGPoint(x: self.bounds.width * 0.47, y: self.bounds.width * 0.42))
+        }
+        needlePath.addLine(to: CGPoint(x: self.bounds.width * 0.5, y: self.bounds.height/1.8))
         
         needlePath.close()
         
@@ -195,7 +208,9 @@ public class ABGaugeView: UIView {
         
         // 5
         triangleLayer.fillColor = needleColor.cgColor
+        triangleLayer.lineWidth = 1.5
         triangleLayer.strokeColor = needleColor.cgColor
+        
         shadowLayer.fillColor = shadowColor.cgColor
         // 6
         layer.addSublayer(shadowLayer)
@@ -224,7 +239,7 @@ public class ABGaugeView: UIView {
         spinAnimation1.fromValue = fromValue//radian(for: fromValue)
         spinAnimation1.toValue = toValue//radian(for: toValue)
         spinAnimation1.duration = duration
-        spinAnimation1.fillMode = kCAFillModeForwards
+        spinAnimation1.fillMode = CAMediaTimingFillMode.forwards
         spinAnimation1.isRemovedOnCompletion = false
         
         CATransaction.setCompletionBlock {
@@ -236,3 +251,4 @@ public class ABGaugeView: UIView {
         CATransaction.commit()
     }
 }
+
