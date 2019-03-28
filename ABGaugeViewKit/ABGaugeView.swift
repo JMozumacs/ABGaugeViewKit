@@ -36,9 +36,19 @@ public class ABGaugeView: UIView {
         }
     }
     
-    @IBInspectable public var useSimpleNeedle: Bool = false
+    @IBInspectable public var useSimpleNeedle: Bool = false{
+        didSet{
+            setNeedsDisplay()
+        }
+    }
     
     @IBInspectable public var circlePercents: CGFloat = 0.1{
+        didSet{
+            setNeedsDisplay()
+        }
+    }
+    
+    @IBInspectable public var usePlainArc: Bool = false{
         didSet{
             setNeedsDisplay()
         }
@@ -156,7 +166,7 @@ public class ABGaugeView: UIView {
         // 1
         let center = center
         let radius: CGFloat = max(bounds.width, bounds.height)/2 - self.frame.width/20
-        let lineWidth: CGFloat = 2//self.frame.width/30
+        let lineWidth: CGFloat = usePlainArc ? 2 : self.frame.width/35
         
         // 2
         let path = UIBezierPath(arcCenter: center,
