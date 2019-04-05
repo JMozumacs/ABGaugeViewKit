@@ -18,9 +18,17 @@ public class ABGaugeView: UIView {
     @IBInspectable public var arcAngle: CGFloat = 2.4
     
     @IBInspectable public var needleColor: UIColor = UIColor(red: 18/255.0, green: 112/255.0, blue: 178/255.0, alpha: 1.0)
+    private var oldValue: CGFloat = 0
+    private var shouldReloadNeedle = true
     @IBInspectable public var needleValue: CGFloat = 0 {
+        willSet(newValue) {
+            shouldReloadNeedle = oldValue != needleValue
+            oldValue = needleValue
+        }
         didSet {
-            setNeedsDisplay()
+            if shouldReloadNeedle{
+                setNeedsDisplay()
+            }
         }
     }
     
@@ -235,10 +243,11 @@ public class ABGaugeView: UIView {
         let theD = (radians - thisRadians)/2
         firstAngle += theD
         let needleValue = radian(for: self.needleValue) + firstAngle
-        animate(triangleLayer: triangleLayer, shadowLayer: shadowLayer, fromValue: 0, toValue: needleValue*1.05, duration: 0.5) {
-            self.animate(triangleLayer: triangleLayer, shadowLayer: shadowLayer, fromValue: needleValue*1.05, toValue: needleValue*0.95, duration: 0.4, callBack: {
-                self.animate(triangleLayer: triangleLayer, shadowLayer: shadowLayer, fromValue: needleValue*0.95, toValue: needleValue, duration: 0.6, callBack: {})
-            })
+        let oldValue = radian(for: self.oldValue) + firstAngle
+        animate(triangleLayer: triangleLayer, shadowLayer: shadowLayer, fromValue: oldValue, toValue: needleValue, duration: 0.5) {
+            //            self.animate(triangleLayer: triangleLayer, shadowLayer: shadowLayer, fromValue: needleValue*1.05, toValue: needleValue*0.95, duration: 0.4, callBack: {
+            //                self.animate(triangleLayer: triangleLayer, shadowLayer: shadowLayer, fromValue: needleValue*0.95, toValue: needleValue, duration: 0.6, callBack: {})
+            //            })
         }
     }
     
@@ -261,4 +270,5 @@ public class ABGaugeView: UIView {
         CATransaction.commit()
     }
 }
+
 
